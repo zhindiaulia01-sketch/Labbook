@@ -6,7 +6,12 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// FUNGSI UNTUK MENAMPILKAN DATA AKUN KE LAYAR
+// Array Riwayat Peminjaman
+let riwayatPeminjaman = [];
+
+// ==========================================
+// 1. SISTEM LOGIN & LOCALSTORAGE PERMANEN
+// ==========================================
 function applyUserData(username, email) {
   const displayUsername = document.getElementById('display-username');
   const displayEmail = document.getElementById('display-email');
@@ -25,7 +30,17 @@ function applyUserData(username, email) {
   if (profileInit) profileInit.innerText = initial;
 }
 
-// SIMPAN AKUN SAAT LOGIN
+function checkAndApplyLogin() {
+  const savedName = localStorage.getItem('user_name');
+  const savedEmail = localStorage.getItem('user_email');
+
+  if (savedName && savedEmail) {
+    applyUserData(savedName, savedEmail);
+  } else {
+    applyUserData('', 'Belum login');
+  }
+}
+
 function handleLogin(event) {
   if (event) event.preventDefault();
 
@@ -37,87 +52,44 @@ function handleLogin(event) {
   const username = usernameInput.value;
   const email = emailInput.value;
 
-  // Simpan ke memori browser (localStorage)
+  // Simpan permanen di browser
   localStorage.setItem('user_name', username);
   localStorage.setItem('user_email', email);
 
-  // Pasang ke tampilan
+  // Terapkan ke tampilan
   applyUserData(username, email);
 
   alert('Login berhasil! Selamat datang, ' + username);
-  if (typeof navigateTo === 'function') {
-    navigateTo('home');
-  }
+  navigateTo('home');
 }
 
-// BACA AKUN OTOMATIS SAAT HALAMAN DI-REFRESH / DIBUKA
-window.addEventListener('load', () => {
+// ==========================================
+// 2. FUNGSI VALIDASI: WAJIB LOGIN SEBELUM PINJAM
+// ==========================================
+function submitBooking() {
   const savedName = localStorage.getItem('user_name');
   const savedEmail = localStorage.getItem('user_email');
-
-  // Jika ada data di localStorage, langsung terapkan agar tidak ter-reset saat refresh
-  if (savedName && savedEmail) {
-    applyUserData(savedName, savedEmail);
-  }
-});
-
-// Fungsi pembantu untuk mengupdate semua elemen teks akun di layar
-function applyUserData(username, email) {
-  const displayUsername = document.getElementById('display-username');
   const displayEmail = document.getElementById('display-email');
-  
-  if (displayUsername) displayUsername.innerText = username;
-  if (displayEmail) displayEmail.innerText = email;
 
-  if (document.getElementById('profile-name-label')) {
-    document.getElementById('profile-name-label').innerText = username;
+  const isLoggedOut = !savedName || !savedEmail || (displayEmail && displayEmail.innerText === 'Belum login');
+
+  if (isLoggedOut) {
+    alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
+    navigateTo('profil'); // Bawa otomatis ke halaman pengaturan akun/login
+    return;
   }
-  if (document.getElementById('profile-email-label')) {
-    document.getElementById('profile-email-label').innerText = email;
-  }
-  if (document.getElementById('profile-big-initial') && username) {
-    document.getElementById('profile-big-initial').innerText = username.charAt(0).toUpperCase();
-  }
+
+  // Jika sudah login, arahkan ke halaman form pinjam ruangan
+  navigateTo('pinjam');
 }
 
-// CEK OTOMATIS SAAT APLIKASI/HAP/BROWSER DIBUKA
+// ==========================================
+// 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  const savedName = localStorage.getItem('user_name');
-  const savedEmail = localStorage.getItem('user_email');
-
-  // Jika ada data terdeteksi di localStorage, langsung pasang status login
-  if (savedName && savedEmail) {
-    applyUserData(savedName, savedEmail);
-  }
-});
-
-function handleLogin(event) {
-  if (event) event.preventDefault();
-
-  const username = document.getElementById('input-username').value;
-  const email = document.getElementById('input-email').value;
-
-  // SIMPAN PERMANEN DI BROWSER
-  localStorage.setItem('user_name', username);
-  localStorage.setItem('user_email', email);
-
-  // Terapkan langsung ke layar
+  // Muat status login permanen
   checkAndApplyLogin();
 
-  alert('Login berhasil! Selamat datang, ' + username);
-  if (typeof navigateTo === 'function') {
-    navigateTo('home');
-  }
-}
-
-// Jalankan fungsi ini SETIAP KALI halaman selesai dimuat/di-refresh
-document.addEventListener('DOMContentLoaded', checkAndApplyLogin);
-window.addEventListener('load', checkAndApplyLogin);
-
-// Array Riwayat Peminjaman
-let riwayatPeminjaman = [];
-
-document.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toISOString().split('T')[0]; 
 
   const dateInput = document.getElementById('form-date');
@@ -130,7 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderStatus();
 });
 
-// Navigasi Halaman
+// ==========================================
+// 4. NAVIGASI HALAMAN
+// ==========================================
 function navigateTo(pageId) {
   const pages = ['home', 'jadwal', 'pinjam', 'status', 'profil', 'success'];
   pages.forEach(p => {
@@ -163,10 +137,13 @@ function navigateTo(pageId) {
     }
   });
 
-  document.getElementById('app-content').scrollTop = 0;
+  const appContent = document.getElementById('app-content');
+  if (appContent) appContent.scrollTop = 0;
 }
 
-// Render Jadwal Berdasarkan Tanggal Filter
+// ==========================================
+// 5. RENDER JADWAL & STATUS
+// ==========================================
 function renderJadwal() {
   const scheduleDateInput = document.getElementById('filter-schedule-date');
   const labListContainer = document.getElementById('schedule-lab-list');
@@ -214,7 +191,6 @@ function renderJadwal() {
   labListContainer.innerHTML = htmlContent;
 }
 
-// Validasi Peminjaman (Jam 07.00 - 17.00 & Cek Bentrok Jam)
 function handleFormSubmit(event) {
   event.preventDefault();
 
@@ -229,7 +205,6 @@ function handleFormSubmit(event) {
     return;
   }
 
-  // Validasi Jam Operasional (07:00 s/d 17:00)
   if (timeStart < "07:00" || timeEnd > "17:00") {
     alert('Peminjaman laboratorium hanya tersedia antara pukul 07.00 pagi sampai 17.00 sore!');
     return;
@@ -240,7 +215,6 @@ function handleFormSubmit(event) {
     return;
   }
 
-  // Pengecekan Bentrok Jam Tumpang Tindih
   const isConflict = riwayatPeminjaman.some(item => {
     if (item.rawDate === dateVal && item.lab === lab) {
       return (timeStart < item.timeEnd && timeEnd > item.timeStart);
@@ -281,12 +255,12 @@ function handleFormSubmit(event) {
   document.getElementById('res-time').innerText = timeString;
   document.getElementById('res-code').innerText = bookingCode;
 
-  document.getElementById('booking-form').reset();
+  const bookingForm = document.getElementById('booking-form');
+  if (bookingForm) bookingForm.reset();
 
   navigateTo('success');
 }
 
-// Render Status Peminjaman
 function renderStatus() {
   const container = document.getElementById('status-container');
   if (!container) return;
@@ -301,7 +275,7 @@ function renderStatus() {
           <h3 class="text-sm font-bold text-gray-800">Belum Ada Pengajuan</h3>
           <p class="text-xs text-gray-400 mt-1">Anda belum pernah mengajukan peminjaman ruangan laboratorium.</p>
         </div>
-        <button onclick="navigateTo('pinjam')" class="mt-2 px-4 py-2 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 transition-colors shadow-sm">
+        <button onclick="submitBooking()" class="mt-2 px-4 py-2 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 transition-colors shadow-sm">
           Pinjam Ruangan Sekarang
         </button>
       </div>
@@ -332,27 +306,9 @@ function renderStatus() {
   }
 }
 
-// Simpan Akun
-function handleLogin(event) {
-  event.preventDefault();
-  const username = document.getElementById('input-username').value;
-  const email = document.getElementById('input-email').value;
-
-  if (username && email) {
-    document.getElementById('display-username').innerText = username;
-    document.getElementById('display-email').innerText = email;
-
-    const initial = username.charAt(0).toUpperCase();
-    document.getElementById('profile-initial').innerText = initial;
-    document.getElementById('profile-big-initial').innerText = initial;
-    document.getElementById('profile-name-label').innerText = username;
-    document.getElementById('profile-email-label').innerText = email;
-
-    alert('Akun ' + username + ' berhasil disimpan!');
-    navigateTo('home');
-  }
-}
-
+// ==========================================
+// 6. DOWNLOAD SURAT DOKUMEN HTML
+// ==========================================
 function downloadSurat() {
   const lab = document.getElementById('res-lab').innerText;
   const date = document.getElementById('res-date').innerText;
@@ -445,38 +401,3 @@ function downloadSurat() {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
-
-// Fungsi untuk memasang data akun ke semua elemen
-function checkAndApplyLogin() {
-  const savedName = localStorage.getItem('user_name');
-  const savedEmail = localStorage.getItem('user_email');
-
-  const usernameEl = document.getElementById('display-username');
-  const emailEl = document.getElementById('display-email');
-  const profileNameEl = document.getElementById('profile-name-label');
-  const profileEmailEl = document.getElementById('profile-email-label');
-  const profileInitEl = document.getElementById('profile-initial');
-  const profileBigInitEl = document.getElementById('profile-big-initial');
-
-  if (savedName && savedEmail) {
-    // Jika ada data tersimpan di localStorage (SUDAH LOGIN)
-    if (usernameEl) usernameEl.innerText = savedName;
-    if (emailEl) emailEl.innerText = savedEmail;
-    if (profileNameEl) profileNameEl.innerText = savedName;
-    if (profileEmailEl) profileEmailEl.innerText = savedEmail;
-    
-    const initial = savedName.charAt(0).toUpperCase();
-    if (profileInitEl) profileInitEl.innerText = initial;
-    if (profileBigInitEl) profileBigInitEl.innerText = initial;
-  } else {
-    // Jika belum ada data (BELUM LOGIN)
-    if (usernameEl) usernameEl.innerText = 'Tamu';
-    if (emailEl) emailEl.innerText = 'Belum login';
-    if (profileNameEl) profileNameEl.innerText = 'Tamu';
-    if (profileEmailEl) profileEmailEl.innerText = 'Belum login';
-  }
-}
-
-// Jalankan fungsi ini SETIAP KALI halaman selesai dimuat/di-refresh
-document.addEventListener('DOMContentLoaded', checkAndApplyLogin);
-window.addEventListener('load', checkAndApplyLogin);

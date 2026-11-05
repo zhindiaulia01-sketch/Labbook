@@ -247,6 +247,56 @@ function handleLogin(event) {
   }
 }
 
+// Fungsi Download Surat Peminjaman Lab Resmi
 function downloadSurat() {
-  alert('Surat peminjaman berhasil diunduh!');
+  // Ambil data dari kartu sukses terakhir
+  const lab = document.getElementById('res-lab').innerText;
+  const date = document.getElementById('res-date').innerText;
+  const time = document.getElementById('res-time').innerText;
+  const code = document.getElementById('res-code').innerText;
+  const username = document.getElementById('display-username').innerText;
+  const email = document.getElementById('display-email').innerText;
+
+  // Isi format surat resmi
+  const isiSurat = `=========================================
+          SURAT BUKTI PEMINJAMAN LABORATORIUM
+                       LABBOOK
+=========================================
+
+KODE BOOKING   : ${code}
+STATUS         : DISETUJUI / RESMI
+
+IDENTITAS PEMINJAM:
+- Nama Lengkap : ${username}
+- Email Akun   : ${email}
+
+DETAIL RUANGAN:
+- Laboratorium : ${lab}
+- Tanggal      : ${date}
+- Waktu        : ${time}
+
+-----------------------------------------
+Ketentuan Penggunaan:
+1. Harap tunjukkan surat/kode booking ini kepada petugas lab sebelum memasuki ruangan.
+2. Jaga kebersihan dan ketertiban selama menggunakan fasilitas laboratorium.
+3. Matikan seluruh perangkat komputer dan lampu setelah selesai digunakan.
+
+Dicetak secara otomatis melalui sistem LabBook Vercel.
+=========================================`;
+
+  // Buat elemen file virtual untuk di-download oleh browser
+  const blob = new Blob([isiSurat], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  
+  link.href = url;
+  link.download = `Surat-Peminjaman-${code}.txt`;
+  
+  // Jalankan proses download
+  document.body.appendChild(link);
+  link.click();
+  
+  // Bersihkan memori link
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

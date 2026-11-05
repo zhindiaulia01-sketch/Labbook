@@ -91,52 +91,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function handleLogout() {
-  localStorage.removeItem('user_name');
-  localStorage.removeItem('user_email');
-  
-  applyUserData('Zhindi', 'Belum login');
-  alert('Anda telah keluar dari akun.');
-  navigateTo('home');
-}
+function handleLogin(event) {
+  if (event) event.preventDefault();
 
+  const username = document.getElementById('input-username').value;
+  const email = document.getElementById('input-email').value;
 
-function submitBooking() {
-  const usernameElement = document.getElementById('display-username');
-  const emailElement = document.getElementById('display-email');
-  
-  // Cek apakah belum login
-  const isLoggedOut = !usernameElement || usernameElement.innerText === 'Belum login' || emailElement.innerText === 'Belum ada email' || emailElement.innerText === 'Belum login';
+  // SIMPAN PERMANEN DI BROWSER
+  localStorage.setItem('user_name', username);
+  localStorage.setItem('user_email', email);
 
-  if (isLoggedOut) {
-    alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    
-    // Jika belum login, arahkan ke halaman profil/login
-    if (typeof navigateTo === 'function') {
-      navigateTo('profil'); // Sesuaikan dengan id halaman profil Anda (misal: 'profil' atau 'page-profil')
-    }
-    return;
-  }
+  // Terapkan langsung ke layar
+  checkAndApplyLogin();
 
-  // ==========================================
-  // JIKA SUDAH LOGIN:
-  // Jangan buat layar putih, tapi arahkan ke menu form peminjaman yang benar
-  // (Atau tampilkan bagian form peminjaman Anda di sini)
-  // ==========================================
-  
-  // Coba cek apa nama id untuk form/halaman peminjaman di HTML Anda. 
-  // Jika di HTML Anda menggunakan menu bawah "Pinjam", biasanya itu adalah bagian form.
-  // Contoh jika nama halamannya 'pinjam' atau 'form-pinjam':
+  alert('Login berhasil! Selamat datang, ' + username);
   if (typeof navigateTo === 'function') {
-    navigateTo('pinjam'); // Ganti 'pinjam' dengan id section form peminjaman yang ada di index.html Anda
+    navigateTo('home');
   }
 }
+
+// Jalankan fungsi ini SETIAP KALI halaman selesai dimuat/di-refresh
+document.addEventListener('DOMContentLoaded', checkAndApplyLogin);
+window.addEventListener('load', checkAndApplyLogin);
 
 // Array Riwayat Peminjaman
 let riwayatPeminjaman = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0]; 
 
   const dateInput = document.getElementById('form-date');
   if (dateInput) dateInput.value = today;
@@ -463,3 +445,38 @@ function downloadSurat() {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+// Fungsi untuk memasang data akun ke semua elemen
+function checkAndApplyLogin() {
+  const savedName = localStorage.getItem('user_name');
+  const savedEmail = localStorage.getItem('user_email');
+
+  const usernameEl = document.getElementById('display-username');
+  const emailEl = document.getElementById('display-email');
+  const profileNameEl = document.getElementById('profile-name-label');
+  const profileEmailEl = document.getElementById('profile-email-label');
+  const profileInitEl = document.getElementById('profile-initial');
+  const profileBigInitEl = document.getElementById('profile-big-initial');
+
+  if (savedName && savedEmail) {
+    // Jika ada data tersimpan di localStorage (SUDAH LOGIN)
+    if (usernameEl) usernameEl.innerText = savedName;
+    if (emailEl) emailEl.innerText = savedEmail;
+    if (profileNameEl) profileNameEl.innerText = savedName;
+    if (profileEmailEl) profileEmailEl.innerText = savedEmail;
+    
+    const initial = savedName.charAt(0).toUpperCase();
+    if (profileInitEl) profileInitEl.innerText = initial;
+    if (profileBigInitEl) profileBigInitEl.innerText = initial;
+  } else {
+    // Jika belum ada data (BELUM LOGIN)
+    if (usernameEl) usernameEl.innerText = 'Tamu';
+    if (emailEl) emailEl.innerText = 'Belum login';
+    if (profileNameEl) profileNameEl.innerText = 'Tamu';
+    if (profileEmailEl) profileEmailEl.innerText = 'Belum login';
+  }
+}
+
+// Jalankan fungsi ini SETIAP KALI halaman selesai dimuat/di-refresh
+document.addEventListener('DOMContentLoaded', checkAndApplyLogin);
+window.addEventListener('load', checkAndApplyLogin);

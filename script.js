@@ -23,7 +23,7 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// Array Riwayat Peminjaman (Akan disinkronkan otomatis secara real-time dari Firebase)
+// Array Riwayat Peminjaman (Disinkronkan otomatis dari database online)
 let riwayatPeminjaman = [];
 
 // SINKRONISASI REAL-TIME DARI DATABASE ONLINE KE SEMUA HP
@@ -83,11 +83,10 @@ function submitBooking() {
 
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    navigateTo('profil'); // Bawa otomatis ke halaman pengaturan akun/login
+    navigateTo('profil'); 
     return;
   }
 
-  // Jika sudah login, arahkan ke halaman form pinjam ruangan
   navigateTo('pinjam');
 }
 
@@ -95,7 +94,6 @@ function submitBooking() {
 // 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Muat status login permanen
   checkAndApplyLogin();
 
   const today = new Date().toISOString().split('T')[0]; 
@@ -150,7 +148,7 @@ function navigateTo(pageId) {
 }
 
 // ==========================================
-// 5. RENDER JADWAL & STATUS (KODE ASLI ANDA)
+// 5. RENDER JADWAL (DENGAN KETERANGAN JAM TERPAKAI)
 // ==========================================
 function renderJadwal() {
   const scheduleDateInput = document.getElementById('filter-schedule-date');
@@ -161,9 +159,11 @@ function renderJadwal() {
 
   let htmlContent = '';
   masterLabs.forEach(lab => {
+    // Saring riwayat peminjaman berdasarkan tanggal yang dipilih dan nama lab
     const bookingsOnDate = riwayatPeminjaman.filter(item => item.rawDate === selectedDate && item.lab === lab.name);
 
     if (bookingsOnDate.length > 0) {
+      // Ambil daftar jam peminjaman yang sudah dibooking
       const timeListText = bookingsOnDate.map(b => `${b.timeStart.replace(':', '.')} - ${b.timeEnd.replace(':', '.')}`).join(', ');
 
       htmlContent += `
@@ -199,6 +199,9 @@ function renderJadwal() {
   labListContainer.innerHTML = htmlContent;
 }
 
+// ==========================================
+// 6. FORM SUBMIT & PENCEGAHAN BENTROK JAM
+// ==========================================
 function handleFormSubmit(event) {
   event.preventDefault();
 
@@ -223,6 +226,7 @@ function handleFormSubmit(event) {
     return;
   }
 
+  // Pengecekan tabrakan jam secara real-time
   const isConflict = riwayatPeminjaman.some(item => {
     if (item.rawDate === dateVal && item.lab === lab) {
       return (timeStart < item.timeEnd && timeEnd > item.timeStart);
@@ -258,7 +262,7 @@ function handleFormSubmit(event) {
     status: 'Disetujui'
   };
 
-  // SIMPAN KE FIREBASE DATABASE ONLINE (SINKRON ANTAR HP)
+  // KIRIM KE FIREBASE DATABASE ONLINE AGAR TERSINKRON KE SEMUA HP
   database.ref('riwayat_peminjaman/' + uniqueId).set(dataPeminjaman)
     .catch((error) => {
       alert('Gagal menyimpan ke server: ' + error.message);
@@ -321,7 +325,7 @@ function renderStatus() {
 }
 
 // ==========================================
-// 6. DOWNLOAD SURAT DOKUMEN HTML
+// 7. DOWNLOAD SURAT DOKUMEN HTML
 // ==========================================
 function downloadSurat() {
   const lab = document.getElementById('res-lab').innerText;
@@ -417,7 +421,7 @@ function downloadSurat() {
 }
 
 // ==========================================
-// 7. FUNGSI LOGIN AKUN (KODE ASLI ANDA)
+// 8. FUNGSI LOGIN AKUN
 // ==========================================
 function handleLogin(event) {
   event.preventDefault();
@@ -425,7 +429,6 @@ function handleLogin(event) {
   const email = document.getElementById('input-email').value;
 
   if (username && email) {
-    // Simpan permanen ke localStorage juga
     localStorage.setItem('user_name', username);
     localStorage.setItem('user_email', email);
 

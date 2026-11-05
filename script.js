@@ -1,3 +1,6 @@
+// ==========================================
+// 0. INISIALISASI FIREBASE (HANYA SEKALI)
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyA144TCCBAuHns...",
   authDomain: "labbook-d2976.firebaseapp.com",
@@ -8,11 +11,13 @@ const firebaseConfig = {
   appId: "1:413503015903:web:2..."
 };
 
-// Cukup ditulis SEKALI saja
-firebase.initializeApp(firebaseConfig);
+// Inisialisasi aman (Cek apakah firebase sudah ter-load)
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const database = firebase.database();
 
-// Master Data Laboratoriumgit add .
+// Master Data Laboratorium
 const masterLabs = [
   { name: 'Lab Komputer 1', capacity: 30 },
   { name: 'Lab Komputer 2', capacity: 25 },
@@ -20,10 +25,9 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// Array Riwayat Peminjaman (Disinkronkan otomatis secara real-time dari database online)
 let riwayatPeminjaman = [];
 
-// SINKRONISASI REAL-TIME DARI DATABASE ONLINE KE SEMUA HP
+// SINKRONISASI REAL-TIME
 database.ref('riwayat_peminjaman').on('value', (snapshot) => {
   const data = snapshot.val();
   if (data) {
@@ -37,7 +41,7 @@ database.ref('riwayat_peminjaman').on('value', (snapshot) => {
 });
 
 // ==========================================
-// 1. SISTEM LOGIN & LOCALSTORAGE PERMANEN
+// 1. SISTEM LOGIN & LOCALSTORAGE
 // ==========================================
 function applyUserData(username, email) {
   const displayUsername = document.getElementById('display-username');
@@ -70,20 +74,15 @@ function checkAndApplyLogin() {
 
 function handleLogin(event) {
   if (event) event.preventDefault();
-
   const usernameInput = document.getElementById('input-username');
   const emailInput = document.getElementById('input-email');
-
   if (!usernameInput || !emailInput) return;
 
   const username = usernameInput.value;
   const email = emailInput.value;
 
-  // Simpan permanen di browser
   localStorage.setItem('user_name', username);
   localStorage.setItem('user_email', email);
-
-  // Terapkan ke tampilan
   applyUserData(username, email);
 
   alert('Login berhasil! Selamat datang, ' + username);
@@ -91,7 +90,7 @@ function handleLogin(event) {
 }
 
 // ==========================================
-// 2. FUNGSI VALIDASI: WAJIB LOGIN SEBELUM PINJAM
+// 2. VALIDASI PEMINJAMAN
 // ==========================================
 function submitBooking() {
   const savedName = localStorage.getItem('user_name');
@@ -110,13 +109,12 @@ function submitBooking() {
 }
 
 // ==========================================
-// 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
+// 3. INISIALISASI KETIKA HALAMAN DIMUAT
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   checkAndApplyLogin();
 
   const today = new Date().toISOString().split('T')[0]; 
-
   const dateInput = document.getElementById('form-date');
   if (dateInput) dateInput.value = today;
 
@@ -167,7 +165,7 @@ function navigateTo(pageId) {
 }
 
 // ==========================================
-// 5. RENDER JADWAL & STATUS (DENGAN JAM TERPAKAI)
+// 5. RENDER JADWAL & PROSES SUBMIT BOOKING
 // ==========================================
 function renderJadwal() {
   const scheduleDateInput = document.getElementById('filter-schedule-date');
@@ -260,7 +258,7 @@ function handleFormSubmit(event) {
 
   const timeString = `${timeStart.replace(':', '.')} sampai ${timeEnd.replace(':', '.')}`;
   const bookingCode = 'LB-' + Math.floor(100000 + Math.random() * 900000);
-  const uniqueId = 'booking_' + Date.now(); // ID unik untuk server online
+  const uniqueId = 'booking_' + Date.now();
 
   const dataPeminjaman = {
     id: uniqueId,
@@ -275,8 +273,10 @@ function handleFormSubmit(event) {
     status: 'Disetujui'
   };
 
-  // KIRIM KE FIREBASE DATABASE ONLINE AGAR TERSINKRON KE SEMUA HP
   database.ref('riwayat_peminjaman/' + uniqueId).set(dataPeminjaman)
+    .then(() => {
+      console.log("Berhasil simpan ke Firebase");
+    })
     .catch((error) => {
       alert('Gagal menyimpan ke server: ' + error.message);
     });
@@ -408,7 +408,7 @@ function downloadSurat() {
         </ol>
       </div>
       <div class="footer-note">
-        Dicetak otomatis melalui sistem <strong>LabBook Vercel</strong>
+        Dicetak otomatis melalui sistem <strong>LabBook</strong>
       </div>
     </div>
     <footer class="page-footer">

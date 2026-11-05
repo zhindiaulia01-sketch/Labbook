@@ -1,0 +1,25 @@
+:root {
+  --primary-color: #0d9488;      
+  --primary-hover: #0f766e;
+  --primary-light: #f0fdfa;
+  --bg-app: #f8fafc;
+}
+
+/* Scrollbar halus */
+#app-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+#app-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#app-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Navigasi */
+.nav-btn {
+  transition: color 0.2s ease-in-out;
+}

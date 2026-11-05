@@ -8,9 +8,7 @@ const firebaseConfig = {
   appId: "1:413503015903:web:2..."
 };
 
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-// Inisialisasi Firebase
+// Cukup ditulis SEKALI saja
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 

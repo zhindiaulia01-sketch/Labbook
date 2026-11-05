@@ -1,3 +1,20 @@
+// ==========================================
+// INISIALISASI FIREBASE (SINKRONISASI ANTAR HP)
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyA144TCCBAuHns...",
+  authDomain: "labbook-d2976.firebaseapp.com",
+  databaseURL: "https://labbook-d2976-default-rtdb.firebaseio.com/",
+  projectId: "labbook-d2976",
+  storageBucket: "labbook-d2976.firebasestorage.app",
+  messagingSenderId: "413503015903",
+  appId: "1:413503015903:web:2..."
+};
+
+// Inisialisasi Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Master Data Laboratorium
 const masterLabs = [
   { name: 'Lab Komputer 1', capacity: 30 },
@@ -6,8 +23,21 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// Array Riwayat Peminjaman
+// Array Riwayat Peminjaman (Real-time dari Firebase)
 let riwayatPeminjaman = [];
+
+// SINKRONISASI REAL-TIME DARI DATABASE ONLINE
+database.ref('riwayat_peminjaman').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    riwayatPeminjaman = Object.values(data);
+  } else {
+    riwayatPeminjaman = [];
+  }
+  
+  if (typeof renderJadwal === 'function') renderJadwal();
+  if (typeof renderStatus === 'function') renderStatus();
+});
 
 // ==========================================
 // 1. SISTEM LOGIN & LOCALSTORAGE PERMANEN
@@ -52,11 +82,9 @@ function handleLogin(event) {
   const username = usernameInput.value;
   const email = emailInput.value;
 
-  // Simpan permanen di browser
   localStorage.setItem('user_name', username);
   localStorage.setItem('user_email', email);
 
-  // Terapkan ke tampilan
   applyUserData(username, email);
 
   alert('Login berhasil! Selamat datang, ' + username);
@@ -75,11 +103,10 @@ function submitBooking() {
 
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    navigateTo('profil'); // Bawa otomatis ke halaman pengaturan akun/login
+    navigateTo('profil');
     return;
   }
 
-  // Jika sudah login, arahkan ke halaman form pinjam ruangan
   navigateTo('pinjam');
 }
 
@@ -87,7 +114,6 @@ function submitBooking() {
 // 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Muat status login permanen
   checkAndApplyLogin();
 
   const today = new Date().toISOString().split('T')[0]; 
@@ -235,8 +261,10 @@ function handleFormSubmit(event) {
 
   const timeString = `${timeStart.replace(':', '.')} sampai ${timeEnd.replace(':', '.')}`;
   const bookingCode = 'LB-' + Math.floor(100000 + Math.random() * 900000);
+  const uniqueId = 'booking_' + Date.now();
 
   const dataPeminjaman = {
+    id: uniqueId,
     lab: lab,
     rawDate: dateVal,
     date: formattedDate,
@@ -248,7 +276,14 @@ function handleFormSubmit(event) {
     status: 'Disetujui'
   };
 
-  riwayatPeminjaman.unshift(dataPeminjaman);
+  // KIRIM KE FIREBASE DATABASE ONLINE (SINKRON ANTAR HP)
+  database.ref('riwayat_peminjaman/' + uniqueId).set(dataPeminjaman)
+    .then(() => {
+      console.log('Berhasil tersinkron ke database!');
+    })
+    .catch((error) => {
+      alert('Gagal menyimpan: ' + error.message);
+    });
 
   document.getElementById('res-lab').innerText = lab;
   document.getElementById('res-date').innerText = formattedDate;

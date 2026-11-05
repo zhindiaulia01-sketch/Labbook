@@ -1,5 +1,5 @@
 // ==========================================
-// INISIALISASI FIREBASE (SINKRONISASI ANTAR HP)
+// 0. INISIALISASI FIREBASE (SINKRONISASI ANTAR HP)
 // ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyA144TCCBAuHns...",
@@ -23,10 +23,10 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// Array Riwayat Peminjaman (Real-time dari Firebase)
+// Array Riwayat Peminjaman (Akan disinkronkan otomatis secara real-time dari Firebase)
 let riwayatPeminjaman = [];
 
-// SINKRONISASI REAL-TIME DARI DATABASE ONLINE
+// SINKRONISASI REAL-TIME DARI DATABASE ONLINE KE SEMUA HP
 database.ref('riwayat_peminjaman').on('value', (snapshot) => {
   const data = snapshot.val();
   if (data) {
@@ -71,26 +71,6 @@ function checkAndApplyLogin() {
   }
 }
 
-function handleLogin(event) {
-  if (event) event.preventDefault();
-
-  const usernameInput = document.getElementById('input-username');
-  const emailInput = document.getElementById('input-email');
-
-  if (!usernameInput || !emailInput) return;
-
-  const username = usernameInput.value;
-  const email = emailInput.value;
-
-  localStorage.setItem('user_name', username);
-  localStorage.setItem('user_email', email);
-
-  applyUserData(username, email);
-
-  alert('Login berhasil! Selamat datang, ' + username);
-  navigateTo('home');
-}
-
 // ==========================================
 // 2. FUNGSI VALIDASI: WAJIB LOGIN SEBELUM PINJAM
 // ==========================================
@@ -103,10 +83,11 @@ function submitBooking() {
 
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    navigateTo('profil');
+    navigateTo('profil'); // Bawa otomatis ke halaman pengaturan akun/login
     return;
   }
 
+  // Jika sudah login, arahkan ke halaman form pinjam ruangan
   navigateTo('pinjam');
 }
 
@@ -114,6 +95,7 @@ function submitBooking() {
 // 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Muat status login permanen
   checkAndApplyLogin();
 
   const today = new Date().toISOString().split('T')[0]; 
@@ -168,7 +150,7 @@ function navigateTo(pageId) {
 }
 
 // ==========================================
-// 5. RENDER JADWAL & STATUS
+// 5. RENDER JADWAL & STATUS (KODE ASLI ANDA)
 // ==========================================
 function renderJadwal() {
   const scheduleDateInput = document.getElementById('filter-schedule-date');
@@ -276,13 +258,10 @@ function handleFormSubmit(event) {
     status: 'Disetujui'
   };
 
-  // KIRIM KE FIREBASE DATABASE ONLINE (SINKRON ANTAR HP)
+  // SIMPAN KE FIREBASE DATABASE ONLINE (SINKRON ANTAR HP)
   database.ref('riwayat_peminjaman/' + uniqueId).set(dataPeminjaman)
-    .then(() => {
-      console.log('Berhasil tersinkron ke database!');
-    })
     .catch((error) => {
-      alert('Gagal menyimpan: ' + error.message);
+      alert('Gagal menyimpan ke server: ' + error.message);
     });
 
   document.getElementById('res-lab').innerText = lab;
@@ -435,4 +414,31 @@ function downloadSurat() {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+// ==========================================
+// 7. FUNGSI LOGIN AKUN (KODE ASLI ANDA)
+// ==========================================
+function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById('input-username').value;
+  const email = document.getElementById('input-email').value;
+
+  if (username && email) {
+    // Simpan permanen ke localStorage juga
+    localStorage.setItem('user_name', username);
+    localStorage.setItem('user_email', email);
+
+    document.getElementById('display-username').innerText = username;
+    document.getElementById('display-email').innerText = email;
+
+    const initial = username.charAt(0).toUpperCase();
+    document.getElementById('profile-initial').innerText = initial;
+    document.getElementById('profile-big-initial').innerText = initial;
+    document.getElementById('profile-name-label').innerText = username;
+    document.getElementById('profile-email-label').innerText = email;
+
+    alert('Akun ' + username + ' berhasil disimpan!');
+    navigateTo('home');
+  }
 }

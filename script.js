@@ -16,19 +16,24 @@ function submitBooking() {
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
     
-    // Arahkan ke halaman profil/login jika belum login
+    // Jika belum login, arahkan ke halaman profil/login
     if (typeof navigateTo === 'function') {
-      navigateTo('page-profil'); 
+      navigateTo('profil'); // Sesuaikan dengan id halaman profil Anda (misal: 'profil' atau 'page-profil')
     }
     return;
   }
 
   // ==========================================
   // JIKA SUDAH LOGIN:
-  // Arahkan ke halaman form peminjaman lab Anda
+  // Jangan buat layar putih, tapi arahkan ke menu form peminjaman yang benar
+  // (Atau tampilkan bagian form peminjaman Anda di sini)
   // ==========================================
+  
+  // Coba cek apa nama id untuk form/halaman peminjaman di HTML Anda. 
+  // Jika di HTML Anda menggunakan menu bawah "Pinjam", biasanya itu adalah bagian form.
+  // Contoh jika nama halamannya 'pinjam' atau 'form-pinjam':
   if (typeof navigateTo === 'function') {
-    navigateTo('page-peminjaman'); // Sesuaikan dengan id halaman form peminjaman di HTML Anda (misal: 'page-form', 'form-pinjam', dll)
+    navigateTo('pinjam'); // Ganti 'pinjam' dengan id section form peminjaman yang ada di index.html Anda
   }
 }
 

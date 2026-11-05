@@ -6,22 +6,60 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
+// FUNGSI UNTUK MENAMPILKAN DATA AKUN KE LAYAR
+function applyUserData(username, email) {
+  const displayUsername = document.getElementById('display-username');
+  const displayEmail = document.getElementById('display-email');
+  const profileName = document.getElementById('profile-name-label');
+  const profileEmail = document.getElementById('profile-email-label');
+  const profileBigInit = document.getElementById('profile-big-initial');
+  const profileInit = document.getElementById('profile-initial');
+
+  if (displayUsername) displayUsername.innerText = username;
+  if (displayEmail) displayEmail.innerText = email;
+  if (profileName) profileName.innerText = username;
+  if (profileEmail) profileEmail.innerText = email;
+  
+  const initial = username ? username.charAt(0).toUpperCase() : 'Z';
+  if (profileBigInit) profileBigInit.innerText = initial;
+  if (profileInit) profileInit.innerText = initial;
+}
+
+// SIMPAN AKUN SAAT LOGIN
 function handleLogin(event) {
   if (event) event.preventDefault();
 
-  const username = document.getElementById('input-username').value;
-  const email = document.getElementById('input-email').value;
+  const usernameInput = document.getElementById('input-username');
+  const emailInput = document.getElementById('input-email');
 
-  // 1. SIMPAN KE LOCALSTORAGE (browser menyimpan akun secara permanen)
+  if (!usernameInput || !emailInput) return;
+
+  const username = usernameInput.value;
+  const email = emailInput.value;
+
+  // Simpan ke memori browser (localStorage)
   localStorage.setItem('user_name', username);
   localStorage.setItem('user_email', email);
 
-  // 2. TAMPILKAN KE HALAMAN
+  // Pasang ke tampilan
   applyUserData(username, email);
 
   alert('Login berhasil! Selamat datang, ' + username);
-  navigateTo('home');
+  if (typeof navigateTo === 'function') {
+    navigateTo('home');
+  }
 }
+
+// BACA AKUN OTOMATIS SAAT HALAMAN DI-REFRESH / DIBUKA
+window.addEventListener('load', () => {
+  const savedName = localStorage.getItem('user_name');
+  const savedEmail = localStorage.getItem('user_email');
+
+  // Jika ada data di localStorage, langsung terapkan agar tidak ter-reset saat refresh
+  if (savedName && savedEmail) {
+    applyUserData(savedName, savedEmail);
+  }
+});
 
 // Fungsi pembantu untuk mengupdate semua elemen teks akun di layar
 function applyUserData(username, email) {

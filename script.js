@@ -5,19 +5,33 @@ const masterLabs = [
   { name: 'Lab Jaringan', capacity: 20 },
   { name: 'Lab Multimedia', capacity: 40 }
 ];
-// Validasi: Wajib login sebelum pinjam ruangan
+
 function submitBooking() {
   const usernameElement = document.getElementById('display-username');
-  const isLoggedOut = !usernameElement || usernameElement.innerText === 'Belum login' || usernameElement.innerText === '';
+  const emailElement = document.getElementById('display-email');
+  
+  // Cek apakah belum login
+  const isLoggedOut = !usernameElement || usernameElement.innerText === 'Belum login' || emailElement.innerText === 'Belum ada email' || emailElement.innerText === 'Belum login';
 
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    return false; // Menghentikan proses peminjaman jika belum login
+    
+    // Arahkan ke halaman profil/login jika belum login
+    if (typeof navigateTo === 'function') {
+      navigateTo('page-profil'); 
+    }
+    return;
   }
 
-  // Jika sudah login, biarkan kode booking/peminjaman lama Anda berjalan di sini
-  return true;
+  // ==========================================
+  // JIKA SUDAH LOGIN:
+  // Arahkan ke halaman form peminjaman lab Anda
+  // ==========================================
+  if (typeof navigateTo === 'function') {
+    navigateTo('page-peminjaman'); // Sesuaikan dengan id halaman form peminjaman di HTML Anda (misal: 'page-form', 'form-pinjam', dll)
+  }
 }
+
 // Array Riwayat Peminjaman
 let riwayatPeminjaman = [];
 

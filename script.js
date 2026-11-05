@@ -1,3 +1,20 @@
+// ==========================================
+// 0. INISIALISASI FIREBASE (SINKRONISASI ANTAR HP)
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyA144TCCBAuHns...",
+  authDomain: "labbook-d2976.firebaseapp.com",
+  databaseURL: "https://labbook-d2976-default-rtdb.firebaseio.com/",
+  projectId: "labbook-d2976",
+  storageBucket: "labbook-d2976.firebasestorage.app",
+  messagingSenderId: "413503015903",
+  appId: "1:413503015903:web:2..."
+};
+
+// Inisialisasi Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Master Data Laboratorium
 const masterLabs = [
   { name: 'Lab Komputer 1', capacity: 30 },
@@ -6,8 +23,21 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
-// Array Riwayat Peminjaman
+// Array Riwayat Peminjaman (Disinkronkan otomatis secara real-time dari database online)
 let riwayatPeminjaman = [];
+
+// SINKRONISASI REAL-TIME DARI DATABASE ONLINE KE SEMUA HP
+database.ref('riwayat_peminjaman').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    riwayatPeminjaman = Object.values(data);
+  } else {
+    riwayatPeminjaman = [];
+  }
+  
+  if (typeof renderJadwal === 'function') renderJadwal();
+  if (typeof renderStatus === 'function') renderStatus();
+});
 
 // ==========================================
 // 1. SISTEM LOGIN & LOCALSTORAGE PERMANEN
@@ -142,7 +172,7 @@ function navigateTo(pageId) {
 }
 
 // ==========================================
-// 5. RENDER JADWAL & STATUS
+// 5. RENDER JADWAL & STATUS (DENGAN JAM TERPAKAI)
 // ==========================================
 function renderJadwal() {
   const scheduleDateInput = document.getElementById('filter-schedule-date');
@@ -235,8 +265,10 @@ function handleFormSubmit(event) {
 
   const timeString = `${timeStart.replace(':', '.')} sampai ${timeEnd.replace(':', '.')}`;
   const bookingCode = 'LB-' + Math.floor(100000 + Math.random() * 900000);
+  const uniqueId = 'booking_' + Date.now(); // ID unik untuk database online
 
   const dataPeminjaman = {
+    id: uniqueId,
     lab: lab,
     rawDate: dateVal,
     date: formattedDate,
@@ -248,7 +280,11 @@ function handleFormSubmit(event) {
     status: 'Disetujui'
   };
 
-  riwayatPeminjaman.unshift(dataPeminjaman);
+  // KIRIM KE FIREBASE DATABASE ONLINE AGAR TERSINKRON KE SEMUA HP
+  database.ref('riwayat_peminjaman/' + uniqueId).set(dataPeminjaman)
+    .catch((error) => {
+      alert('Gagal menyimpan ke server: ' + error.message);
+    });
 
   document.getElementById('res-lab').innerText = lab;
   document.getElementById('res-date').innerText = formattedDate;

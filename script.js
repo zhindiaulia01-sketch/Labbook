@@ -247,9 +247,8 @@ function handleLogin(event) {
   }
 }
 
-// Fungsi Download Surat Peminjaman Lab Resmi
+// Fungsi Download Surat Peminjaman Lab Estetik (HTML / PDF-Ready)
 function downloadSurat() {
-  // Ambil data dari kartu sukses terakhir
   const lab = document.getElementById('res-lab').innerText;
   const date = document.getElementById('res-date').innerText;
   const time = document.getElementById('res-time').innerText;
@@ -257,46 +256,104 @@ function downloadSurat() {
   const username = document.getElementById('display-username').innerText;
   const email = document.getElementById('display-email').innerText;
 
-  // Isi format surat resmi
-  const isiSurat = `=========================================
-          SURAT BUKTI PEMINJAMAN LABORATORIUM
-                       LABBOOK
-=========================================
+  const htmlSurat = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surat Peminjaman - ${code}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
 
-KODE BOOKING   : ${code}
-STATUS         : DISETUJUI / RESMI
+  <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+    <!-- Header Surat -->
+    <div class="bg-teal-600 p-6 text-white text-center relative overflow-hidden">
+      <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500 rounded-full opacity-30"></div>
+      <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+        <i class="fa-solid fa-flask text-2xl text-white"></i>
+      </div>
+      <h1 class="text-2xl font-bold tracking-wider">LABBOOK</h1>
+      <p class="text-xs text-teal-100 mt-1">Bukti Peminjaman Laboratorium Resmi</p>
+    </div>
 
-IDENTITAS PEMINJAM:
-- Nama Lengkap : ${username}
-- Email Akun   : ${email}
+    <!-- Status Badge & QR Fake -->
+    <div class="p-6 space-y-5">
+      <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+        <div>
+          <span class="text-[10px] text-slate-400 font-semibold tracking-wider block">KODE BOOKING</span>
+          <span class="text-base font-bold text-slate-800 font-mono">${code}</span>
+        </div>
+        <span class="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-check text-xs"></i> DISETUJUI
+        </span>
+      </div>
 
-DETAIL RUANGAN:
-- Laboratorium : ${lab}
-- Tanggal      : ${date}
-- Waktu        : ${time}
+      <!-- Detail Informasi -->
+      <div class="space-y-3 text-xs">
+        <div class="border-b border-slate-100 pb-2.5">
+          <span class="text-slate-400 block text-[10px]">PEMINJAM</span>
+          <span class="font-bold text-slate-800 text-sm">${username}</span>
+          <span class="text-slate-500 block">${email}</span>
+        </div>
 
------------------------------------------
-Ketentuan Penggunaan:
-1. Harap tunjukkan surat/kode booking ini kepada petugas lab sebelum memasuki ruangan.
-2. Jaga kebersihan dan ketertiban selama menggunakan fasilitas laboratorium.
-3. Matikan seluruh perangkat komputer dan lampu setelah selesai digunakan.
+        <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
+          <div>
+            <span class="text-slate-400 block text-[10px]">LABORATORIUM</span>
+            <span class="font-semibold text-slate-800">${lab}</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[10px]">TANGGAL</span>
+            <span class="font-semibold text-slate-800">${date}</span>
+          </div>
+        </div>
 
-Dicetak secara otomatis melalui sistem LabBook Vercel.
-=========================================`;
+        <div class="border-b border-slate-100 pb-2.5">
+          <span class="text-slate-400 block text-[10px]">JAM OPERASIONAL</span>
+          <span class="font-semibold text-teal-700">${time}</span>
+        </div>
+      </div>
 
-  // Buat elemen file virtual untuk di-download oleh browser
-  const blob = new Blob([isiSurat], { type: 'text/plain;charset=utf-8' });
+      <!-- Tata Tertib / Catatan -->
+      <div class="bg-teal-50/70 p-3.5 rounded-2xl border border-teal-100 text-[11px] text-teal-900 space-y-1">
+        <p class="font-semibold flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info text-teal-600"></i> Ketentuan Penggunaan:
+        </p>
+        <ul class="list-disc list-inside text-[10px] text-slate-600 space-y-0.5 pl-1">
+          <li>Tunjukkan surat ini kepada petugas lab.</li>
+          <li>Jaga kebersihan dan peralatan lab.</li>
+          <li>Matikan listrik & komputer setelah dipakai.</li>
+        </ul>
+      </div>
+
+      <!-- Footer Surat -->
+      <div class="text-center pt-2">
+        <p class="text-[10px] text-slate-400">Diterbitkan otomatis oleh sistem LabBook Vercel</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Otomatis memicu dialog cetak PDF saat file dibuka
+    window.onload = function() {
+      setTimeout(() => { window.print(); }, 500);
+    };
+  </script>
+</body>
+</html>`;
+
+  const blob = new Blob([htmlSurat], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   
   link.href = url;
-  link.download = `Surat-Peminjaman-${code}.txt`;
+  link.download = `Surat-Peminjaman-${code}.html`;
   
-  // Jalankan proses download
   document.body.appendChild(link);
   link.click();
   
-  // Bersihkan memori link
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+

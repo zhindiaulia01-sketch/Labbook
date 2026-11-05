@@ -105,11 +105,10 @@ function submitBooking() {
 
   if (isLoggedOut) {
     alert('Anda harus login terlebih dahulu sebelum meminjam ruangan laboratorium!');
-    navigateTo('profil'); // Bawa otomatis ke halaman pengaturan akun/login
+    navigateTo('profil'); 
     return;
   }
 
-  // Jika sudah login, arahkan ke halaman form pinjam ruangan
   navigateTo('pinjam');
 }
 
@@ -117,7 +116,6 @@ function submitBooking() {
 // 3. INISIALISASI SAAT HALAMAN DIMUAT / REFRESH
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Muat status login permanen
   checkAndApplyLogin();
 
   const today = new Date().toISOString().split('T')[0]; 
@@ -265,7 +263,7 @@ function handleFormSubmit(event) {
 
   const timeString = `${timeStart.replace(':', '.')} sampai ${timeEnd.replace(':', '.')}`;
   const bookingCode = 'LB-' + Math.floor(100000 + Math.random() * 900000);
-  const uniqueId = 'booking_' + Date.now(); // ID unik untuk database online
+  const uniqueId = 'booking_' + Date.now(); // ID unik untuk server online
 
   const dataPeminjaman = {
     id: uniqueId,

@@ -246,9 +246,9 @@ function handleLogin(event) {
     navigateTo('home');
   }
 }
-
-// Fungsi Download Surat Peminjaman Lab (CSS Terpisah dari JS)
+// Fungsi Download Surat Peminjaman Lab Resmi (Teks Dirapikan & Ditengahkan)
 function downloadSurat() {
+  // Ambil data dari kartu sukses terakhir
   const lab = document.getElementById('res-lab').innerText;
   const date = document.getElementById('res-date').innerText;
   const time = document.getElementById('res-time').innerText;
@@ -256,142 +256,53 @@ function downloadSurat() {
   const username = document.getElementById('display-username').innerText;
   const email = document.getElementById('display-email').innerText;
 
-  const htmlSurat = `<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Surat Peminjaman Laboratorium - ${code}</title>
-  <!-- Memanggil file CSS eksternal -->
-  <link rel="stylesheet" href="style.css">
-</head>
-<body style="background: #555; margin: 0; padding: 20px;">
+  // Isi format surat resmi dengan perataan tengah (centered)
+  const isiSurat = `
+         ====================================================
+               SURAT BUKTI PEMINJAMAN LABORATORIUM
+                            LABBOOK
+         ====================================================
 
-  <div class="surat-page">
-    <!-- KOP SURAT -->
-    <div class="surat-kop">
-      <div class="surat-logo">LB</div>
-      <div class="surat-kop-text">
-        <h3>KEMENTERIAN PENDIDIKAN, TEKNOLOGI, DAN SAINS</h3>
-        <h2>UNIT PENGELOLA LABORATORIUM TERPADU</h2>
-        <h1>UNIVERSITAS DIGITAL INDONESIA</h1>
-        <p>Gedung Lab Terpadu Lantai 3, Jl. Kampus Utama No. 10, Telp. (021) 5558899</p>
-      </div>
-    </div>
+           KODE BOOKING   : ${code}
+           STATUS         : DISETUJUI / RESMI
 
-    <!-- NOMOR SURAT -->
-    <div class="surat-nomor">
-      <table>
-        <tr>
-          <td style="width: 70px;">Nomor</td>
-          <td style="width: 15px;">:</td>
-          <td>B / ${Math.floor(100 + Math.random() * 900)} / UPLT / ${new Date().getFullYear()}</td>
-          <td style="text-align: right;">${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
-        </tr>
-        <tr>
-          <td>Lampiran</td>
-          <td>:</td>
-          <td colspan="2">1 (Satu) Berkas</td>
-        </tr>
-        <tr>
-          <td>Perihal</td>
-          <td>:</td>
-          <td colspan="2"><b>Izin Peminjaman Fasilitas Laboratorium</b></td>
-        </tr>
-      </table>
-    </div>
+           --------------------------------------------------
+           IDENTITAS PEMINJAM:
+           - Nama Lengkap : ${username}
+           - Email Akun   : ${email}
 
-    <!-- TUJUAN -->
-    <div class="surat-paragraf">
-      Kepada Yth.<br>
-      <b>Petugas / Laboran Penanggung Jawab</b><br>
-      di Tempat
-    </div>
+           DETAIL RUANGAN:
+           - Laboratorium : ${lab}
+           - Tanggal      : ${date}
+           - Waktu        : ${time}
+           --------------------------------------------------
 
-    <!-- PARAGRAF PEMBUKA -->
-    <div class="surat-paragraf">
-      Dengan hormat,<br>
-      Sehubungan dengan adanya kegiatan praktikum, penelitian, dan penggunaan fasilitas akademik mahasiswa, bersama surat ini diberitahukan bahwa mahasiswa berikut telah mengajukan permohonan peminjaman ruangan laboratorium melalui sistem terintegrasi <b>LabBook</b>:
-    </div>
+           Ketentuan Penggunaan:
+           1. Harap tunjukkan surat/kode booking ini kepada 
+              petugas lab sebelum memasuki ruangan.
+           2. Jaga kebersihan dan ketertiban selama menggunakan 
+              fasilitas laboratorium.
+           3. Matikan seluruh perangkat komputer dan lampu 
+              setelah selesai digunakan.
 
-    <!-- RINCIAN TABEL -->
-    <table class="surat-table">
-      <tr>
-        <td class="col-label">Nama Peminjam</td>
-        <td>: <b>${username}</b></td>
-      </tr>
-      <tr>
-        <td class="col-label">Identitas Akun</td>
-        <td>: ${email}</td>
-      </tr>
-      <tr>
-        <td class="col-label">Kode Booking / Reg</td>
-        <td>: <b>${code}</b></td>
-      </tr>
-      <tr>
-        <td class="col-label">Laboratorium</td>
-        <td>: <b>${lab}</b></td>
-      </tr>
-      <tr>
-        <td class="col-label">Hari / Tanggal</td>
-        <td>: ${date}</td>
-      </tr>
-      <tr>
-        <td class="col-label">Waktu Operasional</td>
-        <td>: ${time}</td>
-      </tr>
-      <tr>
-        <td class="col-label">Status Pengajuan</td>
-        <td>: <span style="color: #047857; font-weight: bold;">DISETUJUI / RESMI</span></td>
-      </tr>
-    </table>
+         ====================================================
+              Dicetak otomatis melalui sistem LabBook Vercel
+         ====================================================
+`;
 
-    <!-- PARAGRAF PENUTUP -->
-    <div class="surat-paragraf">
-      Demikian surat izin peminjaman ini diterbitkan agar dapat dipergunakan sebagaimana mestinya dengan memperhatikan ketentuan di bawah ini:
-    </div>
-
-    <!-- KETENTUAN -->
-    <div class="surat-ketentuan">
-      <b>Ketentuan & Tata Tertib Penggunaan:</b>
-      <ol>
-        <li>Peminjam wajib menunjukkan surat bukti dan kode booking ini kepada petugas laboratorium sebelum memasuki ruangan.</li>
-        <li>Menjaga kebersihan, ketertiban, serta keutuhan perangkat keras/lunak yang ada di dalam laboratorium.</li>
-        <li>Dilarang membawa makanan atau minuman ke dalam area laboratorium.</li>
-        <li>Wajib mematikan seluruh perangkat komputer, pendingin ruangan (AC), dan lampu setelah kegiatan berakhir.</li>
-      </ol>
-    </div>
-
-    <!-- TANDA TANGAN -->
-    <div class="surat-ttd">
-      <div style="margin-bottom: 2px;">Mengetahui / Mengesahkan,</div>
-      <div><b>Kepala Laboratorium Terpadu</b></div>
-      <div class="surat-ttd-space"></div>
-      <div><b>Dr. Ir. LabBook M.T.</b></div>
-      <div style="font-size: 11px;">NIP. 19800202 200501 1 002</div>
-    </div>
-    <div class="clear-float"></div>
-
-  </div>
-
-  <script>
-    window.onload = function() {
-      setTimeout(() => { window.print(); }, 500);
-    };
-  </script>
-</body>
-</html>`;
-
-  const blob = new Blob([htmlSurat], { type: 'text/html;charset=utf-8' });
+  // Buat elemen file virtual untuk di-download oleh browser
+  const blob = new Blob([isiSurat], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   
   link.href = url;
-  link.download = `Surat-Resmi-Laboratorium-${code}.html`;
+  link.download = `Surat-Peminjaman-${code}.txt`;
   
+  // Jalankan proses download
   document.body.appendChild(link);
   link.click();
+  
+  // Bersihkan memori link
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
-

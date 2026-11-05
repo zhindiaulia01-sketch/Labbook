@@ -23,3 +23,130 @@
 .nav-btn {
   transition: color 0.2s ease-in-out;
 }
+
+/* ==========================================
+   STYLE KHUSUS SURAT PEMINJAMAN RESMI (PRINT/PDF)
+   ========================================== */
+.surat-page {
+  font-family: 'Times New Roman', Times, serif;
+  color: #000;
+  background: #fff;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 20mm 25mm;
+  box-sizing: border-box;
+}
+
+/* Kop Surat */
+.surat-kop {
+  display: flex;
+  align-items: center;
+  border-bottom: 4px double #000;
+  padding-bottom: 12px;
+  margin-bottom: 25px;
+}
+.surat-logo {
+  width: 75px;
+  height: 75px;
+  background: #0f766e;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+.surat-kop-text {
+  text-align: center;
+  flex-grow: 1;
+}
+.surat-kop-text h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+}
+.surat-kop-text h2 {
+  margin: 2px 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+.surat-kop-text h1 {
+  margin: 2px 0;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.surat-kop-text p {
+  margin: 2px 0 0 0;
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* Nomor Surat & Perihal */
+.surat-nomor {
+  margin-bottom: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.surat-nomor table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.surat-nomor td {
+  padding: 2px 0;
+  vertical-align: top;
+}
+
+/* Isi Surat & Tabel Detail */
+.surat-paragraf {
+  font-size: 13px;
+  text-align: justify;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+.surat-table {
+  width: 100%;
+  margin: 15px 0 20px 0;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.surat-table td {
+  padding: 5px 8px;
+  vertical-align: top;
+}
+.surat-table td.col-label {
+  width: 160px;
+}
+
+/* Ketentuan & Tanda Tangan */
+.surat-ketentuan {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 30px;
+}
+.surat-ketentuan ol {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+.surat-ttd {
+  float: right;
+  width: 250px;
+  font-size: 13px;
+  text-align: left;
+}
+.surat-ttd-space {
+  height: 65px;
+}
+.clear-float {
+  clear: both;
+}
+
+/* Pengaturan Cetak/PDF */
+@media print {
+  body { background: #fff; padding: 0; }
+  .surat-page { box-shadow: none; width: 100%; padding: 0; }
+}

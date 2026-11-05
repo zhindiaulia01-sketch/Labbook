@@ -247,7 +247,7 @@ function handleLogin(event) {
   }
 }
 
-// Fungsi Download Surat Peminjaman Lab Estetik (HTML / PDF-Ready)
+// Fungsi Download Surat Peminjaman Lab (CSS Terpisah dari JS)
 function downloadSurat() {
   const lab = document.getElementById('res-lab').innerText;
   const date = document.getElementById('res-date').innerText;
@@ -261,81 +261,120 @@ function downloadSurat() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Surat Peminjaman - ${code}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Surat Peminjaman Laboratorium - ${code}</title>
+  <!-- Memanggil file CSS eksternal -->
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
+<body style="background: #555; margin: 0; padding: 20px;">
 
-  <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-    <!-- Header Surat -->
-    <div class="bg-teal-600 p-6 text-white text-center relative overflow-hidden">
-      <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-500 rounded-full opacity-30"></div>
-      <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
-        <i class="fa-solid fa-flask text-2xl text-white"></i>
-      </div>
-      <h1 class="text-2xl font-bold tracking-wider">LABBOOK</h1>
-      <p class="text-xs text-teal-100 mt-1">Bukti Peminjaman Laboratorium Resmi</p>
-    </div>
-
-    <!-- Status Badge & QR Fake -->
-    <div class="p-6 space-y-5">
-      <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-        <div>
-          <span class="text-[10px] text-slate-400 font-semibold tracking-wider block">KODE BOOKING</span>
-          <span class="text-base font-bold text-slate-800 font-mono">${code}</span>
-        </div>
-        <span class="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-check text-xs"></i> DISETUJUI
-        </span>
-      </div>
-
-      <!-- Detail Informasi -->
-      <div class="space-y-3 text-xs">
-        <div class="border-b border-slate-100 pb-2.5">
-          <span class="text-slate-400 block text-[10px]">PEMINJAM</span>
-          <span class="font-bold text-slate-800 text-sm">${username}</span>
-          <span class="text-slate-500 block">${email}</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 border-b border-slate-100 pb-2.5">
-          <div>
-            <span class="text-slate-400 block text-[10px]">LABORATORIUM</span>
-            <span class="font-semibold text-slate-800">${lab}</span>
-          </div>
-          <div>
-            <span class="text-slate-400 block text-[10px]">TANGGAL</span>
-            <span class="font-semibold text-slate-800">${date}</span>
-          </div>
-        </div>
-
-        <div class="border-b border-slate-100 pb-2.5">
-          <span class="text-slate-400 block text-[10px]">JAM OPERASIONAL</span>
-          <span class="font-semibold text-teal-700">${time}</span>
-        </div>
-      </div>
-
-      <!-- Tata Tertib / Catatan -->
-      <div class="bg-teal-50/70 p-3.5 rounded-2xl border border-teal-100 text-[11px] text-teal-900 space-y-1">
-        <p class="font-semibold flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-info text-teal-600"></i> Ketentuan Penggunaan:
-        </p>
-        <ul class="list-disc list-inside text-[10px] text-slate-600 space-y-0.5 pl-1">
-          <li>Tunjukkan surat ini kepada petugas lab.</li>
-          <li>Jaga kebersihan dan peralatan lab.</li>
-          <li>Matikan listrik & komputer setelah dipakai.</li>
-        </ul>
-      </div>
-
-      <!-- Footer Surat -->
-      <div class="text-center pt-2">
-        <p class="text-[10px] text-slate-400">Diterbitkan otomatis oleh sistem LabBook Vercel</p>
+  <div class="surat-page">
+    <!-- KOP SURAT -->
+    <div class="surat-kop">
+      <div class="surat-logo">LB</div>
+      <div class="surat-kop-text">
+        <h3>KEMENTERIAN PENDIDIKAN, TEKNOLOGI, DAN SAINS</h3>
+        <h2>UNIT PENGELOLA LABORATORIUM TERPADU</h2>
+        <h1>UNIVERSITAS DIGITAL INDONESIA</h1>
+        <p>Gedung Lab Terpadu Lantai 3, Jl. Kampus Utama No. 10, Telp. (021) 5558899</p>
       </div>
     </div>
+
+    <!-- NOMOR SURAT -->
+    <div class="surat-nomor">
+      <table>
+        <tr>
+          <td style="width: 70px;">Nomor</td>
+          <td style="width: 15px;">:</td>
+          <td>B / ${Math.floor(100 + Math.random() * 900)} / UPLT / ${new Date().getFullYear()}</td>
+          <td style="text-align: right;">${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
+        </tr>
+        <tr>
+          <td>Lampiran</td>
+          <td>:</td>
+          <td colspan="2">1 (Satu) Berkas</td>
+        </tr>
+        <tr>
+          <td>Perihal</td>
+          <td>:</td>
+          <td colspan="2"><b>Izin Peminjaman Fasilitas Laboratorium</b></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- TUJUAN -->
+    <div class="surat-paragraf">
+      Kepada Yth.<br>
+      <b>Petugas / Laboran Penanggung Jawab</b><br>
+      di Tempat
+    </div>
+
+    <!-- PARAGRAF PEMBUKA -->
+    <div class="surat-paragraf">
+      Dengan hormat,<br>
+      Sehubungan dengan adanya kegiatan praktikum, penelitian, dan penggunaan fasilitas akademik mahasiswa, bersama surat ini diberitahukan bahwa mahasiswa berikut telah mengajukan permohonan peminjaman ruangan laboratorium melalui sistem terintegrasi <b>LabBook</b>:
+    </div>
+
+    <!-- RINCIAN TABEL -->
+    <table class="surat-table">
+      <tr>
+        <td class="col-label">Nama Peminjam</td>
+        <td>: <b>${username}</b></td>
+      </tr>
+      <tr>
+        <td class="col-label">Identitas Akun</td>
+        <td>: ${email}</td>
+      </tr>
+      <tr>
+        <td class="col-label">Kode Booking / Reg</td>
+        <td>: <b>${code}</b></td>
+      </tr>
+      <tr>
+        <td class="col-label">Laboratorium</td>
+        <td>: <b>${lab}</b></td>
+      </tr>
+      <tr>
+        <td class="col-label">Hari / Tanggal</td>
+        <td>: ${date}</td>
+      </tr>
+      <tr>
+        <td class="col-label">Waktu Operasional</td>
+        <td>: ${time}</td>
+      </tr>
+      <tr>
+        <td class="col-label">Status Pengajuan</td>
+        <td>: <span style="color: #047857; font-weight: bold;">DISETUJUI / RESMI</span></td>
+      </tr>
+    </table>
+
+    <!-- PARAGRAF PENUTUP -->
+    <div class="surat-paragraf">
+      Demikian surat izin peminjaman ini diterbitkan agar dapat dipergunakan sebagaimana mestinya dengan memperhatikan ketentuan di bawah ini:
+    </div>
+
+    <!-- KETENTUAN -->
+    <div class="surat-ketentuan">
+      <b>Ketentuan & Tata Tertib Penggunaan:</b>
+      <ol>
+        <li>Peminjam wajib menunjukkan surat bukti dan kode booking ini kepada petugas laboratorium sebelum memasuki ruangan.</li>
+        <li>Menjaga kebersihan, ketertiban, serta keutuhan perangkat keras/lunak yang ada di dalam laboratorium.</li>
+        <li>Dilarang membawa makanan atau minuman ke dalam area laboratorium.</li>
+        <li>Wajib mematikan seluruh perangkat komputer, pendingin ruangan (AC), dan lampu setelah kegiatan berakhir.</li>
+      </ol>
+    </div>
+
+    <!-- TANDA TANGAN -->
+    <div class="surat-ttd">
+      <div style="margin-bottom: 2px;">Mengetahui / Mengesahkan,</div>
+      <div><b>Kepala Laboratorium Terpadu</b></div>
+      <div class="surat-ttd-space"></div>
+      <div><b>Dr. Ir. LabBook M.T.</b></div>
+      <div style="font-size: 11px;">NIP. 19800202 200501 1 002</div>
+    </div>
+    <div class="clear-float"></div>
+
   </div>
 
   <script>
-    // Otomatis memicu dialog cetak PDF saat file dibuka
     window.onload = function() {
       setTimeout(() => { window.print(); }, 500);
     };
@@ -348,11 +387,10 @@ function downloadSurat() {
   const link = document.createElement('a');
   
   link.href = url;
-  link.download = `Surat-Peminjaman-${code}.html`;
+  link.download = `Surat-Resmi-Laboratorium-${code}.html`;
   
   document.body.appendChild(link);
   link.click();
-  
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }

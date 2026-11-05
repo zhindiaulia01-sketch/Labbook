@@ -258,10 +258,10 @@ function downloadSurat() {
 
   // Isi format surat resmi dengan perataan tengah (centered)
   const isiSurat = `
-         ====================================================
-               SURAT BUKTI PEMINJAMAN LABORATORIUM
-                            LABBOOK
-         ====================================================
+         ================================================
+                 SURAT BUKTI PEMINJAMAN LABORATORIUM
+                               LABBOOK
+         ================================================
 
            KODE BOOKING   : ${code}
            STATUS         : DISETUJUI / RESMI
@@ -285,9 +285,9 @@ function downloadSurat() {
            3. Matikan seluruh perangkat komputer dan lampu 
               setelah selesai digunakan.
 
-         ====================================================
+         ================================================
               Dicetak otomatis melalui sistem LabBook Vercel
-         ====================================================
+         ================================================
 `;
 
   // Buat elemen file virtual untuk di-download oleh browser

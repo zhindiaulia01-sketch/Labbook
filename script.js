@@ -6,6 +6,63 @@ const masterLabs = [
   { name: 'Lab Multimedia', capacity: 40 }
 ];
 
+function handleLogin(event) {
+  if (event) event.preventDefault();
+
+  const username = document.getElementById('input-username').value;
+  const email = document.getElementById('input-email').value;
+
+  // 1. SIMPAN KE LOCALSTORAGE (browser menyimpan akun secara permanen)
+  localStorage.setItem('user_name', username);
+  localStorage.setItem('user_email', email);
+
+  // 2. TAMPILKAN KE HALAMAN
+  applyUserData(username, email);
+
+  alert('Login berhasil! Selamat datang, ' + username);
+  navigateTo('home');
+}
+
+// Fungsi pembantu untuk mengupdate semua elemen teks akun di layar
+function applyUserData(username, email) {
+  const displayUsername = document.getElementById('display-username');
+  const displayEmail = document.getElementById('display-email');
+  
+  if (displayUsername) displayUsername.innerText = username;
+  if (displayEmail) displayEmail.innerText = email;
+
+  if (document.getElementById('profile-name-label')) {
+    document.getElementById('profile-name-label').innerText = username;
+  }
+  if (document.getElementById('profile-email-label')) {
+    document.getElementById('profile-email-label').innerText = email;
+  }
+  if (document.getElementById('profile-big-initial') && username) {
+    document.getElementById('profile-big-initial').innerText = username.charAt(0).toUpperCase();
+  }
+}
+
+// CEK OTOMATIS SAAT APLIKASI/HAP/BROWSER DIBUKA
+document.addEventListener('DOMContentLoaded', () => {
+  const savedName = localStorage.getItem('user_name');
+  const savedEmail = localStorage.getItem('user_email');
+
+  // Jika ada data terdeteksi di localStorage, langsung pasang status login
+  if (savedName && savedEmail) {
+    applyUserData(savedName, savedEmail);
+  }
+});
+
+function handleLogout() {
+  localStorage.removeItem('user_name');
+  localStorage.removeItem('user_email');
+  
+  applyUserData('Zhindi', 'Belum login');
+  alert('Anda telah keluar dari akun.');
+  navigateTo('home');
+}
+
+
 function submitBooking() {
   const usernameElement = document.getElementById('display-username');
   const emailElement = document.getElementById('display-email');

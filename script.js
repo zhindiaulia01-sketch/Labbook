@@ -1,21 +1,17 @@
-// ==========================================
-// 0. INISIALISASI FIREBASE (SINKRONISASI ANTAR HP)
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyA144TCCBAuHns...",
   authDomain: "labbook-d2976.firebaseapp.com",
-  databaseURL: "https://labbook-d2976-default-rtdb.firebaseio.com/",
+  databaseURL: "https://labbook-d2976-default-rtdb.asia-southeast1.firebasebasedatabase.app",
   projectId: "labbook-d2976",
   storageBucket: "labbook-d2976.firebasestorage.app",
   messagingSenderId: "413503015903",
   appId: "1:413503015903:web:2..."
 };
-
 // Inisialisasi Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Master Data Laboratorium
+// Master Data Laboratoriumgit add .
 const masterLabs = [
   { name: 'Lab Komputer 1', capacity: 30 },
   { name: 'Lab Komputer 2', capacity: 25 },
